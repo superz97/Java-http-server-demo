@@ -12,7 +12,7 @@ import java.util.Map;
 public class ApplicationController {
 
     @RequestMapping(path = "/", method = HttpMethod.GET)
-    public ResponseContext simpleOk() {
+    public ResponseContext simpleOk(RequestContext context) {
         return ResponseContext.build(HttpStatus.OK);
     }
 

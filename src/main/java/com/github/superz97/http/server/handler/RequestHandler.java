@@ -3,6 +3,7 @@ package com.github.superz97.http.server.handler;
 import com.github.superz97.http.server.common.HttpStatus;
 import com.github.superz97.http.server.request.RequestContext;
 import com.github.superz97.http.server.response.ResponseContext;
+import com.github.superz97.http.server.service.HandlerMethodResolver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,8 +14,11 @@ public class RequestHandler implements Runnable{
 
     private final Socket clientSocket;
 
+    private final HandlerMethodResolver handlerMethodResolver;
+
     public RequestHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
+        this.handlerMethodResolver = new HandlerMethodResolver();
     }
 
     @Override
@@ -28,12 +32,19 @@ public class RequestHandler implements Runnable{
                 return;
             }
             var os = clientSocket.getOutputStream();
-            if (context.pathIsEqualsTo("/")) {
-                os.write(ResponseContext.build(HttpStatus.OK).getResponseAsBytes());
-                os.flush();
-            } else {
+            var handlerMethod = handlerMethodResolver.resolve(context);
+            if (handlerMethod == null) {
                 os.write(ResponseContext.build(HttpStatus.NOT_FOUND).getResponseAsBytes());
                 os.flush();
+            } else {
+                ResponseContext responseContext = handlerMethod.invoke(context);
+                if (responseContext.getStatus().isError()) {
+                    os.write(ResponseContext.build(responseContext.getStatus()).getResponseAsBytes());
+                    os.flush();
+                } else {
+                    os.write(responseContext.getResponseAsBytes());
+                    os.flush();
+                }
             }
         } catch (IOException ex) {
             throw new RuntimeException("Handler exception", ex);
