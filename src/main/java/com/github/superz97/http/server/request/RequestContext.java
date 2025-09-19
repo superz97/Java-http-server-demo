@@ -103,6 +103,10 @@ public class RequestContext {
         return pathParts;
     }
 
+    public String getLastPart() {
+        return getPart(pathParts.size() - 1);
+    }
+
     @Override
     public String toString() {
         return "RequestContext{" +
