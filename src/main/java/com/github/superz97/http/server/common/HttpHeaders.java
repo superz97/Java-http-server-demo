@@ -17,7 +17,7 @@ public class HttpHeaders {
         Map<String, List<String>> headers = new HashMap<>();
         headerList.forEach(line -> {
             int colonIndex = line.indexOf(':');
-            if (colonIndex == -1) {
+            if (colonIndex != -1) {
                 String name = line.substring(0, colonIndex).trim();
                 String value = line.substring(colonIndex + 1).trim();
                 headers.computeIfAbsent(name.toLowerCase(), k -> new ArrayList<>()).add(value);
