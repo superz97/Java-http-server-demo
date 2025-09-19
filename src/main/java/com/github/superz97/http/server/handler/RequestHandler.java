@@ -1,6 +1,7 @@
 package com.github.superz97.http.server.handler;
 
 import com.github.superz97.http.server.common.HttpStatus;
+import com.github.superz97.http.server.interceptor.InterceptorHolder;
 import com.github.superz97.http.server.request.RequestContext;
 import com.github.superz97.http.server.response.ResponseContext;
 import com.github.superz97.http.server.service.HandlerMethodResolver;
@@ -42,6 +43,7 @@ public class RequestHandler implements Runnable{
                     os.write(ResponseContext.build(responseContext.getStatus()).getResponseAsBytes());
                     os.flush();
                 } else {
+                    InterceptorHolder.getInstance().beforeSendResponse(context, responseContext);
                     os.write(responseContext.getResponseAsBytes());
                     os.flush();
                 }
